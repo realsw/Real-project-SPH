@@ -1,7 +1,7 @@
 <template>
-  <div>我是search
-    <h1>parms: {{$route.params.keyword}}</h1>
-    <h1>query:{{$route.query.k}}</h1>
+  <div>
+    <h1>hahaha</h1>
+    <TypeNav/>
   </div>
 
 </template>

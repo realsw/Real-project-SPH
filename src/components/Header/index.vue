@@ -59,7 +59,7 @@ export default {
       gosearch(){
         this.$router.push({
           name:'search',
-          params:{keyword:this.keyword},
+          params:{keyword:this.keyword || undefined},
           query:{k:this.keyword.toUpperCase()}
         },()=>{},()=>{})
       }
