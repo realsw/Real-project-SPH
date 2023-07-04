@@ -11,15 +11,22 @@
             </li>
           </ul>
           <ul class="fl sui-tag">
-            <li class="with-x">手机</li>
-            <li class="with-x">iphone<i>×</i></li>
-            <li class="with-x">华为<i>×</i></li>
-            <li class="with-x">OPPO<i>×</i></li>
+
+            <li class="with-x" v-if="searchParams.categoryName">
+              {{ this.searchParams.categoryName }}<i @click="removeCategoryName">×</i></li>
+
+            <li class="with-x" v-if="searchParams.keyword">
+              {{ this.searchParams.keyword }}<i @click="removeKeyword">×</i></li>
+              <li class="with-x" v-if="searchParams.trademark">
+              {{ this.searchParams.trademark.split(":")[1] }}<i @click="removeTrademark">×</i></li>
+
+
+
           </ul>
         </div>
 
         <!--selector-->
-        <SearchSelector />
+        <SearchSelector @trademarkInfo = "trademarkInfo" />
 
         <!--details-->
         <div class="details clearfix">
@@ -135,7 +142,8 @@ export default {
         pagesize: 10,//每一页所展示数据的个数
         props: [],//平台售卖属性所带参数
         trademark: "",//品牌
-      }
+      },
+
     }
   },
 
@@ -157,7 +165,54 @@ export default {
     //把这次请求封装为一个函数，按需使用
     getData() {
       this.$store.dispatch('getSearchList', this.searchParams)
+    },
+    //面包屑点击处理，删除分类名字，重新发请求
+    removeCategoryName() {
+      //把带给服务器的参数置空,再向服务器发请求
+      /* 由于带给服务器的参数为非必须参数，所以可以将相应字段变为undefined，而不是空字符串
+        这可以使当前字段不会带给服务器，完成优化，而不是变为空字符串 */
+      this.searchParams.categoryName = undefined;
+      this.searchParams.category1Id = undefined;
+      this.searchParams.category2Id = undefined;
+      this.searchParams.category3Id = undefined;
+      this.getData();
+      //此处需完成地址栏的修改，进行路由跳转(编程式导航)
+      if (this.$router.params) {
+        this.$router.push({ name: "search", params: this.$router.params })
+      }
+    },
+    //面包屑点击处理，删除关键字，重新发请求
+    removeKeyword() {
+      //给服务器带的参数searchparams的keyword置空
+      this.searchParams.keyword = undefined;
+      //再次发请求
+      this.getData();
+      //通知兄弟组件Header清除关键字
+      this.$bus.$emit("clear");
+      //进行路由跳转
+      if (this.$router.query) {
+        this.$router.push({ name: "search", query: this.$router.query });
+      }
+    },
+    //自定义事件回调
+    trademarkInfo(trademark){
+      console.log('woshifuqin',trademark);
+      //整理品牌字段的参数 "ID:品牌名称"  然后发请求进行展示
+      this.searchParams.trademark = `${trademark.tmId}:${trademark.tmName}`;
+      this.getData();
+    },
+    //删除品牌信息
+    removeTrademark(){
+    //将品牌信息置空
+    this.searchParams.trademark = "";  
+    //再次发请求
+    this.getData();
     }
+    
+
+
+
+
   },
   //数据监听：监听组件实例身上的属性的属性值变化
   watch: {
