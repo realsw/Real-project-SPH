@@ -11,22 +11,25 @@
             </li>
           </ul>
           <ul class="fl sui-tag">
-
+            <!-- 分类的面包屑 -->
             <li class="with-x" v-if="searchParams.categoryName">
               {{ this.searchParams.categoryName }}<i @click="removeCategoryName">×</i></li>
-
+            <!-- 关键字的面包屑 -->
             <li class="with-x" v-if="searchParams.keyword">
               {{ this.searchParams.keyword }}<i @click="removeKeyword">×</i></li>
-              <li class="with-x" v-if="searchParams.trademark">
+            <!-- 品牌的面包屑 -->
+            <li class="with-x" v-if="searchParams.trademark">
               {{ this.searchParams.trademark.split(":")[1] }}<i @click="removeTrademark">×</i></li>
-
+            <!-- 平台售卖属性的面包屑 -->
+            <li class="with-x" v-for="(attrValue, index) in searchParams.props" :key="index">
+              {{ attrValue.split(":")[1] }}<i @click="removeAttr(index)">×</i></li>
 
 
           </ul>
         </div>
 
         <!--selector-->
-        <SearchSelector @trademarkInfo = "trademarkInfo" />
+        <SearchSelector @trademarkInfo="trademarkInfo" @attrInfo="attrInfo" />
 
         <!--details-->
         <div class="details clearfix">
@@ -195,20 +198,41 @@ export default {
       }
     },
     //自定义事件回调
-    trademarkInfo(trademark){
-      console.log('woshifuqin',trademark);
+    trademarkInfo(trademark) {
+
       //整理品牌字段的参数 "ID:品牌名称"  然后发请求进行展示
       this.searchParams.trademark = `${trademark.tmId}:${trademark.tmName}`;
       this.getData();
     },
     //删除品牌信息
-    removeTrademark(){
-    //将品牌信息置空
-    this.searchParams.trademark = "";  
-    //再次发请求
-    this.getData();
+    removeTrademark() {
+      //将品牌信息置空
+      this.searchParams.trademark = "";
+      //再次发请求
+      this.getData();
+    },
+    //收集平台属性的回调函数（自定义事件）
+    attrInfo(attr, attrValue) {
+      console.log(attr, attrValue);
+      //["属性ID：属性值：属性名"]
+      let props = `${attr.attrId}:${attrValue}:${attr.attrName}`;
+      //数组去重
+      if (this.searchParams.props.indexOf(props) == -1) {
+        this.searchParams.props.push(props);
+              //再次发请求
+      this.getData();
+      }
+
+    },
+    //removeAttr删除售卖的属性
+    removeAttr(index){
+      //再次整理参数
+      this.searchParams.props.splice(index,1);
+      //再次发请求
+      this.getData();
     }
-    
+
+
 
 
 
