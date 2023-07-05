@@ -35,24 +35,13 @@
         <div class="details clearfix">
           <div class="sui-navbar">
             <div class="navbar-inner filter">
+              <!-- 排序的结构 -->
               <ul class="sui-nav">
-                <li class="active">
-                  <a href="#">综合</a>
+                <li :class="{ active: isOne }" @click="changeOrder('1')">
+                  <a>综合<span v-show="isOne" class="iconfont" :class="{'icon-up':isAsc,'icon-down':isDesc}"></span></a>
                 </li>
-                <li>
-                  <a href="#">销量</a>
-                </li>
-                <li>
-                  <a href="#">新品</a>
-                </li>
-                <li>
-                  <a href="#">评价</a>
-                </li>
-                <li>
-                  <a href="#">价格⬆</a>
-                </li>
-                <li>
-                  <a href="#">价格⬇</a>
+                <li :class="{ active: isTwo }" @click="changeOrder('2')">
+                  <a>价格<span v-show="isTwo" class="iconfont" :class="{'icon-up':isAsc,'icon-down':isDesc}"></span></a>
                 </li>
               </ul>
             </div>
@@ -140,7 +129,7 @@ export default {
         category3Id: "",//三级分类的id
         categoryName: "",//分类的名字
         keyword: "",//关键字
-        order: "",//排序
+        order: "1:desc",//排序：初始状态应该是综合|降序
         pageNo: 1,//分页器
         pagesize: 10,//每一页所展示数据的个数
         props: [],//平台售卖属性所带参数
@@ -219,18 +208,38 @@ export default {
       //数组去重
       if (this.searchParams.props.indexOf(props) == -1) {
         this.searchParams.props.push(props);
-              //再次发请求
-      this.getData();
+        //再次发请求
+        this.getData();
       }
 
     },
     //removeAttr删除售卖的属性
-    removeAttr(index){
+    removeAttr(index) {
       //再次整理参数
-      this.searchParams.props.splice(index,1);
+      this.searchParams.props.splice(index, 1);
+      //再次发请求
+      this.getData();
+    },
+    //排序
+    changeOrder(flag){
+      //flag形参：是一个标记，代表用户点击的是综合（1），价格（2）
+      //获取初始状态
+      let originFlag = this.searchParams.order.split(":")[0];
+      let originSort = this.searchParams.order.split(":")[1];
+      let newOrder='';
+      //如果点击的是综合
+      if (flag == originFlag) {
+        newOrder = `${originFlag}:${originSort=='desc'? 'asc' : 'desc'}`;
+      } else {
+        //点击的是价格
+        newOrder = `${flag}:${'desc'}`;
+      }
+      //将新的order赋予searchParams
+      this.searchParams.order = newOrder;
       //再次发请求
       this.getData();
     }
+
 
 
 
@@ -260,7 +269,25 @@ export default {
             goodsList:state=>state.search.searchlist.goodsList
           }) */
     //mapGetters里面的写法：传递的数组，因为getters计算里面没有划分模块【home，search】
-    ...mapGetters(['goodsList', 'trademarkList', 'attrsList'])
+    ...mapGetters(['goodsList']),
+
+    isOne() {
+      return this.searchParams.order.indexOf('1') != -1 ;
+      
+    },
+    
+
+    isTwo() {
+      return this.searchParams.order.indexOf('2') != -1 ;
+    },
+
+    isAsc() {
+      return this.searchParams.order.indexOf('asc')!= -1 ;
+
+    },
+    isDesc() {
+      return this.searchParams.order.indexOf('desc') != -1 ;
+    }
   }
 }
 </script>
