@@ -34,7 +34,7 @@ export default new VueRouter({
             meta:{show:false}
         },
         {
-            path:'/detail/:id',
+            path:'/detail/:skuId',
             component:Detail,
             meta:{show:false}
         }
