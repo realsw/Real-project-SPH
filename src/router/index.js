@@ -1,5 +1,5 @@
 //配置路由
-import Vue from "vue";
+import Vue, { defineAsyncComponent } from "vue";
 import VueRouter from 'vue-router'
 //使用插件
 Vue.use(VueRouter);
@@ -8,6 +8,7 @@ import Home from '@/pages/Home'
 import Search from '@/pages/Search'
 import Login from '@/pages/Login'
 import Register from '@/pages/Register'
+import Detail from '@/pages/Detail'
 //配置路由
 export default new VueRouter({
     routes: [
@@ -31,8 +32,17 @@ export default new VueRouter({
             path:'/register',
             component:Register,
             meta:{show:false}
+        },
+        {
+            path:'/detail/:id',
+            component:Detail,
+            meta:{show:false}
         }
-    ]
+    ],
+    scrollBehavior (to, from, savedPosition) {
+        // return 期望滚动到哪个的位置
+        return { y : 0}
+      }
 })
 
 
