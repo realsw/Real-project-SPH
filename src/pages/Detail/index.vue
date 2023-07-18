@@ -7,9 +7,9 @@
     <section class="con">
       <!-- 导航路径区域 -->
       <div class="conPoin">
-        <span v-show="categoryView.category1Name">{{categoryView.category1Name}}</span>
-        <span v-show="categoryView.category2Name">{{categoryView.category2Name}}</span>
-        <span v-show="categoryView.category3Name">{{categoryView.category3Name}}</span>
+        <span v-show="categoryView.category1Name">{{ categoryView.category1Name }}</span>
+        <span v-show="categoryView.category2Name">{{ categoryView.category2Name }}</span>
+        <span v-show="categoryView.category3Name">{{ categoryView.category3Name }}</span>
 
       </div>
       <!-- 主要内容区域 -->
@@ -17,21 +17,21 @@
         <!-- 左侧放大镜区域 -->
         <div class="previewWrap">
           <!--放大镜效果-->
-          <Zoom />
+          <Zoom :skuImageList="skuImageList" />
           <!-- 小图列表 -->
-          <ImageList />
+          <ImageList :skuImageList="skuImageList" />
         </div>
         <!-- 右侧选择区域布局 -->
         <div class="InfoWrap">
           <div class="goodsDetail">
-            <h3 class="InfoName">{{skuInfo.skuName}}</h3>
+            <h3 class="InfoName">{{ skuInfo.skuName }}</h3>
             <p class="news">{{ skuInfo.skuDesc }}</p>
             <div class="priceArea">
               <div class="priceArea1">
                 <div class="title">价&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;格</div>
                 <div class="price">
                   <i>¥</i>
-                  <em>{{skuInfo.price}}</em>
+                  <em>{{ skuInfo.price }}</em>
                   <span>降价通知</span>
                 </div>
                 <div class="remark">
@@ -64,30 +64,14 @@
           <div class="choose">
             <div class="chooseArea">
               <div class="choosed"></div>
-              <dl>
-                <dt class="title">选择颜色</dt>
-                <dd changepirce="0" class="active">金色</dd>
-                <dd changepirce="40">银色</dd>
-                <dd changepirce="90">黑色</dd>
+              <dl v-for="(spuSaleAttr, index) in spuSaleAttrList" :key="spuSaleAttr.id">
+                <dt class="title">{{ spuSaleAttr.saleAttrName }}</dt>
+                <dd changepirce="0" :class="{ active: spuSaleAttrValue.isChecked == 1 }"
+                  v-for="(spuSaleAttrValue, index) in spuSaleAttr.spuSaleAttrValueList" :key="spuSaleAttrValue.id" @click="changeActive(spuSaleAttrValue,spuSaleAttr.spuSaleAttrValueList)">
+                  {{ spuSaleAttrValue.saleAttrValueName }}</dd>
+
               </dl>
-              <dl>
-                <dt class="title">内存容量</dt>
-                <dd changepirce="0" class="active">16G</dd>
-                <dd changepirce="300">64G</dd>
-                <dd changepirce="900">128G</dd>
-                <dd changepirce="1300">256G</dd>
-              </dl>
-              <dl>
-                <dt class="title">选择版本</dt>
-                <dd changepirce="0" class="active">公开版</dd>
-                <dd changepirce="-1000">移动版</dd>
-              </dl>
-              <dl>
-                <dt class="title">购买方式</dt>
-                <dd changepirce="0" class="active">官方标配</dd>
-                <dd changepirce="-240">优惠移动版</dd>
-                <dd changepirce="-390">电信优惠版</dd>
-              </dl>
+
             </div>
             <div class="cartWrap">
               <div class="controls">
@@ -360,11 +344,24 @@ export default {
   },
   mounted() {
     //派发action获取产品详情的信息
-    console.log(this.$route.params);
+
     this.$store.dispatch('getDetailInfo', this.$route.params.skuId)
   },
   computed: {
-    ...mapGetters(['categoryView','skuInfo'])
+    ...mapGetters(['categoryView', 'skuInfo', 'spuSaleAttrList']),
+    skuImageList() {
+      return this.skuInfo.skuImageList || [{}];
+    }
+  },
+  methods:{
+    //产品的售卖属性值切换高亮
+    changeActive(spuSaleAttrValue,arr){
+      //遍历全部售卖属性值isChecked为"0”,即没有高亮
+      arr.forEach(item => {
+        item.isChecked = "0" ;
+      });
+      spuSaleAttrValue.isChecked = "1" ;
+    }
   }
 }
 </script>
