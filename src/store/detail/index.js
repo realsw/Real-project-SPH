@@ -1,4 +1,4 @@
-import { reqGoodsInfo } from '@/api/index'
+import { reqGoodsInfo,reqAddOrUpdateShopCart } from '@/api/index'
 //detail模块的仓库
 const state = {
     detailinfo: {}
@@ -17,6 +17,19 @@ const actions = {
             //提交mutation
             commit("DETAILINFO", result.data)
         }
+    },
+    //将产品添加到购物车||修改某个产品的个数的action
+    async addOrUpdateShopCart({commit},{skuId,skuNum}){
+        //加入购物车返回的解构
+        //加入购物车以后，前台将参数带给服务器
+        //服务器写入数据成功，并没有返回其他的数据，只是返回code=200，代表操作成功
+        //因为服务器没有返回其余数据，因此不需要三连环存储数据
+       let result =  await reqAddOrUpdateShopCart(skuId,skuNum);
+       if(result.code==200){
+        return 'ok'
+      }else{
+        return Promise.reject(new Error('fail'));
+      }
     }
 };
 //计算属性，在项目当中，为了简化数据而生。

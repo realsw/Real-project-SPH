@@ -67,7 +67,8 @@
               <dl v-for="(spuSaleAttr, index) in spuSaleAttrList" :key="spuSaleAttr.id">
                 <dt class="title">{{ spuSaleAttr.saleAttrName }}</dt>
                 <dd changepirce="0" :class="{ active: spuSaleAttrValue.isChecked == 1 }"
-                  v-for="(spuSaleAttrValue, index) in spuSaleAttr.spuSaleAttrValueList" :key="spuSaleAttrValue.id" @click="changeActive(spuSaleAttrValue,spuSaleAttr.spuSaleAttrValueList)">
+                  v-for="(spuSaleAttrValue, index) in spuSaleAttr.spuSaleAttrValueList" :key="spuSaleAttrValue.id"
+                  @click="changeActive(spuSaleAttrValue, spuSaleAttr.spuSaleAttrValueList)">
                   {{ spuSaleAttrValue.saleAttrValueName }}</dd>
 
               </dl>
@@ -75,12 +76,12 @@
             </div>
             <div class="cartWrap">
               <div class="controls">
-                <input autocomplete="off" class="itxt" v-model="skuNum" @change="changeSkuNum"/>
+                <input autocomplete="off" class="itxt" v-model="skuNum" @change="changeSkuNum" />
                 <a href="javascript:" class="plus" @click="skuNum++">+</a>
-                <a href="javascript:" class="mins" @click="skuNum>1?skuNum--:skuNum=1">-</a>
+                <a href="javascript:" class="mins" @click="skuNum > 1 ? skuNum-- : skuNum = 1">-</a>
               </div>
               <div class="add">
-                <a href="javascript:">加入购物车</a>
+                <a @click="addShopcar">加入购物车</a>
               </div>
             </div>
           </div>
@@ -337,10 +338,10 @@ import Zoom from './Zoom/Zoom'
 
 export default {
   name: 'Detail',
-  data(){
+  data() {
     return {
       //购买产品的个数
-      skuNum:1
+      skuNum: 1
     }
   },
 
@@ -359,26 +360,46 @@ export default {
       return this.skuInfo.skuImageList || [{}];
     }
   },
-  methods:{
+  methods: {
     //产品的售卖属性值切换高亮
-    changeActive(spuSaleAttrValue,arr){
+    changeActive(spuSaleAttrValue, arr) {
       //遍历全部售卖属性值isChecked为"0”,即没有高亮
       arr.forEach(item => {
-        item.isChecked = "0" ;
+        item.isChecked = "0";
       });
-      spuSaleAttrValue.isChecked = "1" ;
+      spuSaleAttrValue.isChecked = "1";
     },
     //表单元素修改产品个数
-    changeSkuNum(event){
+    changeSkuNum(event) {
       //用户输入进来的文本*1
-      let value = event.target.value *1;
+      let value = event.target.value * 1;
       //如果用户输入进来的非法，出现NaN或者小于1
-      if (isNaN(value)||value<1) {
+      if (isNaN(value) || value < 1) {
         this.skuNum = 1;
-      }else{
+      } else {
         //正常大于1（大于1整数不能出现小数）
         this.skuNum = parseInt(value)
       }
+    },
+    //加入购物车的回调函数
+    async addShopcar() {
+      //1.发请求---将产品加入到数据库（通知服务器）
+      //2.服务器存储成功---进行路由跳转并传递参数
+      //3.存储失败---给用户进行提示
+      try {
+       await this.$store.dispatch('addOrUpdateShopCart', { skuId: this.$route.params.skuId, skuNum: this.skuNum })
+        //进行路由跳转
+        this.$router.push({name:'AddCartSuccess',query:{skuNum:this.skuNum}});
+        //在路由跳转同时还需要将产品信息带给下一级的路由组件
+        //简单的数据比如skuNum，使用query形式给路由组件传递过去，
+        //产品信息的数据，比较复杂：skuInfo，使用会话存储（不持久化，会话结束后数据消失）
+        //本地存储||会话存储 都一般存储的是字符串，不允许存储对象
+        //所以需要JSON.stringify转成字符串
+        sessionStorage.setItem('SKUINFO',JSON.stringify(this.skuInfo))
+      } catch (error) {
+        alert(error.message)
+      }
+
     }
   }
 }
