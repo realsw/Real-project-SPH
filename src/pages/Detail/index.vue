@@ -389,7 +389,7 @@ export default {
       try {
        await this.$store.dispatch('addOrUpdateShopCart', { skuId: this.$route.params.skuId, skuNum: this.skuNum })
         //进行路由跳转
-        this.$router.push({name:'AddCartSuccess',query:{skuNum:this.skuNum}});
+        this.$router.push({name:'addcartsuccess',query:{skuNum:this.skuNum}});
         //在路由跳转同时还需要将产品信息带给下一级的路由组件
         //简单的数据比如skuNum，使用query形式给路由组件传递过去，
         //产品信息的数据，比较复杂：skuInfo，使用会话存储（不持久化，会话结束后数据消失）

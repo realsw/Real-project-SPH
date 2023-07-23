@@ -1,5 +1,5 @@
 //配置路由
-import Vue, { defineAsyncComponent } from "vue";
+import Vue from "vue";
 import VueRouter from 'vue-router'
 //使用插件
 Vue.use(VueRouter);
@@ -10,6 +10,7 @@ import Login from '@/pages/Login'
 import Register from '@/pages/Register'
 import Detail from '@/pages/Detail'
 import AddCartSuccess from '@/pages/AddCartSuccess'
+import ShopCart from '@/pages/ShopCart'
 //配置路由
 export default new VueRouter({
     routes: [
@@ -38,11 +39,17 @@ export default new VueRouter({
             path: '/detail/:skuId',
             component: Detail,
             meta: { show: false }
-        }, 
-        {   
-            name:"AddCartSuccess",
-            path: '/AddCartSuccess',
+        },
+        {
+            name: "addcartsuccess",
+            path: '/addcartsuccess',
             component: AddCartSuccess,
+            meta: { show: true }
+        },
+        {
+            name: "shopcart",
+            path: '/shopcart',
+            component: ShopCart,
             meta: { show: true }
         },
     ],
